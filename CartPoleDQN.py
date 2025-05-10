@@ -19,15 +19,14 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hyperparameters for our DQN agent:
 env_id = 'CartPole-v1'
-buffer_size = 50000
-batch_size = 64
+buffer_size = 200000
+batch_size = 256
 gamma = 0.99 # 1 leads to stochastic instability
-alpha = 0.00025
+alpha, alpha_decay, alpha_min = 0.0001, 1, 0
 target_update_freq = 10 # number of steps we take between theta_target <- theta
-epsilon, epsilon_min, epsilon_decay = 1, 0.05, 0.995
-episodes = 2000
-max_steps = 500
-
+epsilon, epsilon_min, epsilon_decay = 1, 0.01, 0.992 
+episodes = 2500
+max_steps = 500 
 env = gym.make(env_id)
 env.observation_space.seed(SEED)
 env.action_space.seed(SEED)
@@ -51,7 +50,7 @@ replay_buffer = ReplayBuffer(capacity=buffer_size)
 print('starting training')
 episode_rewards = []
 for episode in range(episodes):
-    state, _ = env.reset(seed=SEED)
+    state, _ = env.reset()
     total_reward = 0
     for step in range(max_steps):
         if np.random.rand() < epsilon:
@@ -86,20 +85,25 @@ for episode in range(episodes):
             
             # max a' Q(s', a') from target net
             with torch.no_grad():
-                next_q_values = target_net(next_states).max(1)[0].unsqueeze(1)
+                best_next_actions = policy_net(next_states).argmax(dim=1, keepdim=True) # Policy selects the best action (use keepdim to keep the dimensions 2d as .gather needs that later)
+                next_q_values = target_net(next_states).gather(1, best_next_actions) # Target evaluates that action
                 targets = rewards + gamma * (1 - dones) * next_q_values
             
-            loss = nn.MSELoss()(q_values, targets)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+            warmup = 1000
+            if len(replay_buffer) > warmup and len(replay_buffer) > batch_size:
+                loss = nn.MSELoss()(q_values, targets)
+                optimizer.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(policy_net.parameters(), max_norm=1.0)
+                optimizer.step()
         if done:
             break
     
     epsilon = max(epsilon_min, epsilon * epsilon_decay)
+    alpha = max(alpha_min, alpha * alpha_decay)
     if episode % target_update_freq == 0:
         target_net.load_state_dict(policy_net.state_dict())
     
     episode_rewards.append(total_reward)
     if episode % 10 == 0:
-        print(f'Ep {episode}, R = {total_reward:.1f}, eps = {epsilon:.3f}, recent_avg_reward = {sum(episode_rewards[len(episode_rewards)-100:])/min(100, len(episode_rewards)):.1f}')
+        print(f'Ep {episode}, R = {total_reward:.0f}, eps = {epsilon:.3f}, alpha = {alpha:.5f}, recent_avg_reward = {sum(episode_rewards[len(episode_rewards)-100:])/min(100, len(episode_rewards)):.1f}')

@@ -1,10 +1,13 @@
 # Q-Learning on CartPole-v1
 
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
+
 This project implements **tabular Q-learning** to solve the classic control problem [CartPole-v1](https://www.gymlibrary.dev/environments/classic_control/cart_pole/) using **state discretization**, epsilon-greedy exploration, & Bellman updates.
 
 Despite the continuous state space, Q-learning is made effective by discretizing the observation features into fixed bins and learning Q-values per discrete state–action pair.
 
-10 bins are selected for the cart position, cart velocity, and pole velocity features, while 20 bins are selected for the poll angle feature since it is the most sensitive to small changes.
+10 bins are selected for the cart position, cart velocity, and pole velocity features, while 20 bins are selected for the pole angle feature since it is the most sensitive to small changes.
 
 ---
 
@@ -49,14 +52,14 @@ TBD: ADD REWARD CURVE IMAGE
 ## Files
 
 CartPole.py: Main training loop w/ Q-learning
-discretizer.py: Discretizer class that maps the continuous space to discrete subsapces.
+discretizer.py: Discretizer class that maps the continuous space to discrete subspaces.
 requirements.txt: The requirements needed to run it.
 README.md: You're in the readme right now! This is the project description.
 
 ## How to run
 
 ```bash
-pip install requirements.txt
+pip install -r requirements.txt
 python CartPole.py
 ```
 
