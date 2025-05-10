@@ -1,4 +1,5 @@
 import random
+from matplotlib import pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
@@ -45,6 +46,10 @@ target_net.eval() # disable the gradient computation for the target net
 
 optimizer = optim.Adam(policy_net.parameters(), lr=alpha)
 replay_buffer = ReplayBuffer(capacity=buffer_size)
+
+save_path = "dqn_cartpole_solved.pth"
+solved = False # only save once
+window = 100
 
 # actual training loop
 print('starting training')
@@ -106,4 +111,28 @@ for episode in range(episodes):
     
     episode_rewards.append(total_reward)
     if episode % 10 == 0:
-        print(f'Ep {episode}, R = {total_reward:.0f}, eps = {epsilon:.3f}, alpha = {alpha:.5f}, recent_avg_reward = {sum(episode_rewards[len(episode_rewards)-100:])/min(100, len(episode_rewards)):.1f}')
+        recent = episode_rewards[-window:]
+        recent_avg = sum(recent) / len(recent)
+        print(f"Ep {episode}  R= {total_reward:.0f}, eps = {epsilon:.3f}  alpha = {alpha:.5f} recent avg = {recent_avg:.1f}")
+        if not solved and recent_avg >= max_steps:
+            solved = True
+            torch.save(policy_net.state_dict(), save_path)
+            print(f'Solved! Model saved to {save_path}')
+
+def moving_average(data, n=100):
+    ret = np.cumsum(data, dtype=float)
+    ret[n:] = ret[n:] - ret[:-n]
+    return ret[n - 1:] / n
+
+smoothed = moving_average(episode_rewards, window)
+
+plt.subplot(1,2,2)
+plt.plot(smoothed, label=f"{window}-episode MA")
+plt.xlabel("Episode")
+plt.ylabel("Avg Reward")
+plt.title("Smoothed Reward Curve")
+plt.legend()
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
