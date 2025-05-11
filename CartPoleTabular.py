@@ -4,6 +4,7 @@ if not hasattr(np, 'bool8'): # fix annoying error with gym, this took me 30 minu
 import gym
 from discretizer import Discretizer
 import matplotlib.pyplot as plt
+from typing import Sequence
 
 # Create the environment using gym.make. This defines the place where the agent will trian, including:
 # the reward signal, possible actions, the state, and more.
@@ -30,11 +31,32 @@ max_steps = 500 # max length of simulation, if we haven't failed by t=500 we've 
 rewards = []
 
 # Clips each feature down to [low_i, high_i] to avoid indexing errors or weird rap arounds, mostly with velocities.
-def clip_obs(obs, low, high):
+def clip_obs(obs: np.ndarray, low: np.ndarray, high: np.ndarray) -> np.ndarray:
+    '''
+    Clips each feature of obs into range [low_i, high_i]. Important to avoid wrap arounds.
+    
+    Args:
+        obs (np.ndarray): Array of observations, shape (n_features) or greater.
+        low (np.ndarray): Array of lower bounds, same shape as obs.
+        high (np.ndarray): Array of upper bounds, same shape as obs.
+    
+    Returns:
+        np.ndarray: The clipped array of observations
+    '''
     return np.clip(obs, low, high)
 
 # Compute moving average to smooth data for plotting
-def moving_average(data, window_size=100):
+def moving_average(data: Sequence[float], window_size: int=100) -> np.ndarray:
+    """
+    Computes the moving average of a 1D sequence.
+
+    Args:
+        data (Sequence[float]): A sequence of numeric values.
+        window_size (int): The size of the moving window.
+
+    Returns:
+        np.ndarray: Array of the moving average, length = len(data) - window_size + 1.
+    """
     return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
 
 for episode in range(episodes):
@@ -77,7 +99,17 @@ for episode in range(episodes):
     if episode % 1000 == 0:
         print(f'Episode {episode}, total reward: {total_reward}, Epsilon: {epsilon:.3f}, Alpha: {alpha:.3f}')
 
-def moving_average(data, window_size = 100):
+def moving_average(data: Sequence[float], window_size: int = 100) -> np.ndarray:
+    """
+    Compute the moving average of a 1D sequence.
+
+    Args:
+        data: A sequence of numeric values.
+        window_size: The number of elements over which to average/convolve.
+
+    Returns:
+        A numpy array of size len(data) - window_size + 1 containing the moving average values.
+    """
     return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
 
 print(f'average rewards: {sum(rewards)/len(rewards)}')

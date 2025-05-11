@@ -1,4 +1,5 @@
 import random
+from typing import Sequence
 from matplotlib import pyplot as plt
 import numpy as np
 import torch
@@ -26,7 +27,7 @@ gamma = 0.99 # 1 leads to stochastic instability
 alpha, alpha_decay, alpha_min = 0.0001, 1, 0
 target_update_freq = 10 # number of steps we take between theta_target <- theta
 epsilon, epsilon_min, epsilon_decay = 1, 0.01, 0.992 
-episodes = 2500
+episodes = 10000
 max_steps = 500 
 env = gym.make(env_id)
 env.observation_space.seed(SEED)
@@ -119,7 +120,17 @@ for episode in range(episodes):
             torch.save(policy_net.state_dict(), save_path)
             print(f'Solved! Model saved to {save_path}')
 
-def moving_average(data, n=100):
+def moving_average(data: Sequence[float], n: int=100):
+    """
+    Compute the moving average of a 1D sequence.
+
+    Args:
+        data: A sequence of numeric values.
+        window_size: The number of elements over which to average/convolve.
+
+    Returns:
+        A numpy array of size len(data) - window_size + 1 containing the moving average values.
+    """
     ret = np.cumsum(data, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1:] / n

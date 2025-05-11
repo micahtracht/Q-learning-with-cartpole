@@ -1,7 +1,8 @@
 import numpy as np
-
+from typing import Sequence, List, Tuple
 class Discretizer:
-    def __init__(self, bins_per_feature, lower_bounds, upper_bounds):
+    bins: List[np.ndarray]
+    def __init__(self, bins_per_feature: Sequence[int], lower_bounds: Sequence[float], upper_bounds: Sequence[float]) -> None:
         # These must be the same, or we have an issue with the function. Useful to catch when I make errors. (God RL is tricky).
         assert len(bins_per_feature) == len(lower_bounds) == len(upper_bounds)
         # For each low, high in the feature range, np.linspace makes evenly spaced cut points. Using bins_per_feature + 1 points, we divide the range into bins_per_feature segments.
@@ -16,7 +17,7 @@ class Discretizer:
     # We use np.digitize(value, bin_edges) to do it. This takes in the value, which can be continuous (and should be), and our bin edges, and returns the index of the bin that our value belongs in.
     # We'll use self.bins, as it contains a separate array of bin edges for each feature, based on it's value range.
     # Note that if we have a value below our first bin edge, it maps to 0, and if it's above our last bin edge, it maps to n_bins - 1. This is good, as it avoids index errors (this is why we used [1:-1 above])
-    def discretize(self, observation):
+    def discretize(self, observation: Sequence[float]) -> Tuple[int, ...]:
         # match each feature value with its bin using .zip (zip(observation, self.bins))
         # digitize them using np.digitize to get the index of the bin they belong to (np.digitize(feature_val, bin_edges))
         # collect these indices into our 'state' vector, which is our discretized original state. (state = tuple(...))
@@ -24,5 +25,3 @@ class Discretizer:
             np.digitize(feature_val, bin_edges)
             for feature_val, bin_edges in zip(observation, self.bins)
         )
-
-    

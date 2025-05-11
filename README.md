@@ -15,6 +15,7 @@ Despite the continuous state space, Q-learning is made effective by discretizing
 **Deep Q-learning (DQN)** is performed using a neural network with 2 hidden layers, each with 128 neurons, followed by an output layer, with one value per action. Instability is addressed by using double Q-learning, which makes training more reliable and helps mitigate sudden drops in performance.
 
 A replay buffer of size 200,000 is used alongside random sampling to help ensure reliable, stable updates to the model. Gradient clipping is also used to prevent wild swings and maintain numerical stability.
+
 ---
 
 ## Goal

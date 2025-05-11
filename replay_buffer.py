@@ -1,8 +1,9 @@
 import random
 from collections import deque
-
+from typing import Deque, Tuple, List, Sequence
 class ReplayBuffer:
-    def __init__(self, capacity):
+    buffer: Deque[Tuple[Sequence[float], int, float, Sequence[float], bool]]
+    def __init__(self, capacity: int) -> None:
         '''
         Initializes the replay buffer.
         
@@ -12,7 +13,7 @@ class ReplayBuffer:
         
         self.buffer = deque(maxlen=capacity)
     
-    def add(self, state, action, reward, next_state, done):
+    def add(self, state: Sequence[float], action: int, reward: float, next_state: Sequence[float], done: bool) -> None:
         """
         Stores a single transition in the buffer.
 
@@ -25,7 +26,7 @@ class ReplayBuffer:
         """
         self.buffer.append((state, action, reward, next_state, done))
     
-    def sample(self, batch_size):
+    def sample(self, batch_size: int) -> Tuple[List[Sequence[float]], List[int], List[float], List[Sequence[float]], List[bool]]:
         """
         Samples a random batch of transitions.
         Args:
@@ -35,9 +36,9 @@ class ReplayBuffer:
         """
         batch = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = map(list, zip(*batch))
-        return states, actions, rewards, next_states, dones
+        return states, actions, rewards, next_states, dones 
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the current size of the buffer.
         """
