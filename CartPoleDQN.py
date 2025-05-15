@@ -8,6 +8,7 @@ import torch.optim as optim
 import gym
 from dqn_agent import DQN
 from replay_buffer import ReplayBuffer
+import wandb
 
 SEED = 42 # can anyone explain why this is the standard seed? I just see it everywhere
 random.seed(SEED)
