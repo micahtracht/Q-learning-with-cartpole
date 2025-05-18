@@ -19,7 +19,7 @@ class Config:
     epsilon_decay_dqn: float = 0.992
     episodes_dqn: int = 2_500
     target_update_freq: int = 10
-    max_steps: int = 500
+    max_steps_dqn: int = 500
     window_dqn: int = 100
     save_path: str = 'dqn_cartpole_solved.pth'
     warmup: int = 1000
@@ -36,7 +36,7 @@ class Config:
     epsilon_tabular: float = 1
     epsilon_decay_tabular: float = 0.999
     epsilon_min_tabular: float = 0.01
-    epssiodes_tabular: int = 10_000
+    episodes_tabular: int = 10_000
     max_steps_tabular: int = 500
     window_tabular: int = 100
     

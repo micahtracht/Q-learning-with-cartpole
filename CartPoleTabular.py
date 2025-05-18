@@ -84,11 +84,11 @@ def main(cfg: Config):
                 if done:
                     break
                 
-            # decay schedules
-    alpha = decay(alpha, cfg.alpha_decay_tabular, cfg.alpha_min_tabular)
-    epsilon = decay(epsilon, cfg.epsilon_decay_tabular, cfg.epsilon_min_tabular)
+        # decay schedules
+        alpha = decay(alpha, cfg.alpha_decay_tabular, cfg.alpha_min_tabular)
+        epsilon = decay(epsilon, cfg.epsilon_decay_tabular, cfg.epsilon_min_tabular)
         
-    episode_rewards.append(total_reward)
+        episode_rewards.append(total_reward)
     if episode % 1000 == 0:
         print(f"Episode {episode:5d}  Reward={total_reward:.1f}, epsilon={epsilon:.3f}  alpha={alpha:.3f}")
         
@@ -111,3 +111,5 @@ def plot_rewards(episode_rewards, window_dqn):
     plt.tight_layout()
     plt.show()
 
+if __name__ == '__main__':
+    main(cfg)
