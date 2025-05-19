@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from CartPoleDQN import moving_average, epsilon_min, epsilon_decay, alpha_min, alpha_decay
-
+from config import Config
 
 def test_moving_average_simple():
     """
@@ -86,3 +86,16 @@ def test_alpha_decays_to_minimum():
     for _ in range(1000000):
         a = max(alpha_min, a * alpha_decay)
     assert a == alpha_min
+
+def test_smoke_main_runs_zero_episodes(monkeypatch):
+    """
+    Smoke-test main(cfg) with 0 episodes: should import and return
+    without error when episodes_dqn=0.
+    """
+    # Prevent plotting from blocking
+    import matplotlib.pyplot as plt
+    monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
+
+    cfg = Config()
+    cfg.episodes_dqn = 0
+    main(cfg) # if raises, test fails
