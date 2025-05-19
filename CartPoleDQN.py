@@ -16,11 +16,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # define config
 cfg = Config()
 
-random.seed(cfg.seed)
-np.random.seed(cfg.seed)
-torch.manual_seed(cfg.seed)
+random.seed(cfg.env.seed)
+np.random.seed(cfg.env.seed)
+torch.manual_seed(cfg.env.seed)
 if torch.cuda.is_available():
-    torch.cuda.manual_seed(cfg.seed)
+    torch.cuda.manual_seed(cfg.env.seed)
 
 
 def moving_average(data: Sequence[float], window_size: int=100):
@@ -43,12 +43,12 @@ def decay(value: float, decay_rate: float, min_val: float) -> float:
 
 # - Main training loop -
 def main(cfg: Config):
-    epsilon = cfg.epsilon_dqn
-    alpha = cfg.alpha_dqn
+    epsilon = cfg.dqn.epsilon
+    alpha = cfg.dqn.alpha
     # Set up environment
-    env = gym.make(cfg.env_id)
-    env.observation_space.seed(cfg.seed)
-    env.action_space.seed(cfg.seed)
+    env = gym.make(cfg.env.env_id)
+    env.observation_space.seed(cfg.env.seed)
+    env.action_space.seed(cfg.env.seed)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
     
@@ -71,10 +71,10 @@ def main(cfg: Config):
     episode_rewards = []
     print('Started training.')
     
-    for episode in range(cfg.episodes_dqn):
+    for episode in range(cfg.dqn.episodes):
         state, _ = env.reset()
         total_reward = 0
-        for step in range(cfg.max_steps_dqn):
+        for step in range(cfg.dqn.max_steps):
             # eps greedy policy selection
             if np.random.rand() < epsilon:
                 action = env.action_space.sample()
@@ -109,7 +109,7 @@ def main(cfg: Config):
                 with torch.no_grad():
                     best_next_actions = policy_net(next_states).argmax(dim=1, keepdim=True)
                     next_q_values = target_net(next_states).gather(1, best_next_actions)
-                    targets = rewards + cfg.gamma_dqn * (1 - dones) * next_q_values
+                    targets = rewards + cfg.dqn.gamma * (1 - dones) * next_q_values
                 
                 # loss & backprop
                 if len(replay_buffer) > cfg.warmup:
@@ -122,8 +122,8 @@ def main(cfg: Config):
                 break
         
         # Decay schedules
-        epsilon = decay(epsilon, cfg.epsilon_decay_dqn, cfg.epsilon_min_dqn)
-        alpha = decay(alpha, cfg.alpha_decay_dqn, cfg.alpha_min_dqn)
+        epsilon = decay(epsilon, cfg.dqn.epsilon_decay, cfg.dqn.epsilon_min)
+        alpha = decay(alpha, cfg.dqn.alpha_decay, cfg.dqn.alpha_min)
         
         # sync target net
         if episode % cfg.target_update_freq == 0:
@@ -133,15 +133,15 @@ def main(cfg: Config):
         
         # Logging & saving
         if episode % 10 == 0:
-            recent = episode_rewards[-cfg.window_dqn:]
+            recent = episode_rewards[-cfg.dqn.window:]
             recent_avg = sum(recent) / len(recent)
             print(f"Ep {episode}  R= {total_reward:.0f}, eps = {epsilon:.3f}  alpha = {alpha:.5f} recent avg = {recent_avg:.1f}")
-            if not solved and recent_avg >= cfg.max_steps_dqn:
+            if not solved and recent_avg >= cfg.dqn.max_steps:
                 solved = True
                 torch.save(policy_net.state_dict(), cfg.save_path)
                 print(f'Solved! Model saved to {cfg.save_path}')
         
-    plot_rewards(episode_rewards, cfg.window_dqn)
+    plot_rewards(episode_rewards, cfg.dqn.window)
 
 
 def plot_rewards(episode_rewards, window_dqn):

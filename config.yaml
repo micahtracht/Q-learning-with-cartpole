@@ -1,0 +1,36 @@
+env:
+  env_id: CartPole-v1
+  seed: 42
+
+dqn:
+  buffer_size: 200000
+  batch_size: 256
+  gamma: 0.99
+  alpha: 0.0001
+  alpha_decay: 1.0
+  alpha_min: 0.0
+  epsilon: 1.0
+  epsilon_decay: 0.992
+  epsilon_min: 0.01
+  episodes: 2500
+  target_update_freq: 10
+  max_steps: 500
+  window: 100
+  save_path: dqn_cartpole_solved.pth
+  warmup: 1000
+
+tabular:
+  n_bins: 10
+  n_angle_bins: 20
+  lower_bounds: [-4.8, -5.0, -0.418, -5.0]
+  upper_bounds: [4.8, 5.0, 0.418, 5.0]
+  gamma: 0.99
+  alpha: 0.3
+  alpha_decay: 0.999
+  alpha_min: 0.005
+  epsilon: 1.0
+  epsilon_decay: 0.999
+  epsilon_min: 0.01
+  episodes: 10000
+  max_steps: 500
+  window: 100
