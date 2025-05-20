@@ -7,7 +7,7 @@ def simple_discretizer():
     '''
     Makes a discretizer w/ 2 bins over [-1, 1].
     '''
-    return Discretizer(bins_per_feature=2, lower_bounds=[-1.0], upper_bounds=[1.0])
+    return Discretizer(bins_per_feature=[2], lower_bounds=[-1.0], upper_bounds=[1.0])
 
 def test_bins_internal_structure(simple_discretizer):
     '''
@@ -73,4 +73,4 @@ def test_edge_case_exact_bounds():
     disc = Discretizer([3, 3], lb, ub)
     # 3 bins → edges np.linspace(0,1,4)[1:-1] = [0.25, 0.5, 0.75]
     assert disc.discretize([0.0, -1.0]) == (0, 0) # exactly lower
-    assert disc.discretize([1.0,  1.0]) == (3, 3) # exactly upper
+    assert disc.discretize([1.0,  1.0]) == (2, 2) # exactly upper

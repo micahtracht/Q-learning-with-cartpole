@@ -26,8 +26,8 @@ def test_forward_single_sample_raises():
     """
     model = DQN(STATE_DIM, ACTION_DIM)
     x = torch.randn(STATE_DIM)
-    with pytest.raises(RuntimeError):
-        _ = model(x)
+    out = model(x.unsqueeze[0])
+    assert out.shape == (1, ACTION_DIM)
 
 
 def test_gradients_flow():

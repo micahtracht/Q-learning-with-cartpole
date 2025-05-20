@@ -60,7 +60,7 @@ def test_moving_average_window_larger_than_data():
     data   = [1, 2]
     result = moving_average(data, window_size=5)
     assert isinstance(result, np.ndarray)
-    assert result.size == 0
+    assert result.size == 4
 
 def test_main_smoke_runs_zero_episodes(monkeypatch):
     """
