@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
-from CartPoleDQN import moving_average, epsilon_min, epsilon_decay, alpha_min, alpha_decay
-from config import Config
+from CartPoleDQN import moving_average, main
+from config import cfg
+
+epsilon_min = cfg.dqn.epsilon_min
+epsilon_decay = cfg.dqn.epsilon_decay
+alpha_min = cfg.dqn.alpha_min
+alpha_decay = cfg.dqn.alpha_decay
 
 def test_moving_average_simple():
     """
@@ -9,7 +14,7 @@ def test_moving_average_simple():
     """
     data = [0, 1, 2, 3, 4]
     # moving_average(data, n) uses n window size
-    ma = moving_average(data, n=2)
+    ma = moving_average(data, window_size=2)
     expected = np.array([0.5, 1.5, 2.5, 3.5])
     assert isinstance(ma, np.ndarray)
     assert np.allclose(ma, expected)
@@ -20,7 +25,7 @@ def test_moving_average_window_equals_length():
     When window == len(data), returns one average.
     """
     data = [10, 20, 30]
-    ma = moving_average(data, n=3)
+    ma = moving_average(data, window_size=3)
     # single value: (10+20+30)/3 = 20.0
     assert ma.shape == (1,)
     assert np.allclose(ma, np.array([20.0]))
@@ -31,7 +36,7 @@ def test_moving_average_window_larger_than_data():
     If window > len(data), numpy.convolve with 'valid' → empty array.
     """
     data = [1, 2]
-    ma = moving_average(data, n=5)
+    ma = moving_average(data, window_size=5)
     assert isinstance(ma, np.ndarray)
     assert ma.size == 0
 
@@ -58,7 +63,7 @@ def test_epsilon_decays_to_minimum():
     """
     eps = 1.0
     # apply decay 100,000 times
-    for _ in range(100000):
+    for _ in range(100_000):
         eps = max(epsilon_min, eps * epsilon_decay)
     assert eps == epsilon_min
 
@@ -96,6 +101,6 @@ def test_smoke_main_runs_zero_episodes(monkeypatch):
     import matplotlib.pyplot as plt
     monkeypatch.setattr(plt, "show", lambda *args, **kwargs: None)
 
-    cfg = Config()
-    cfg.episodes_dqn = 0
+
+    cfg.dqn.episodes = 0
     main(cfg) # if raises, test fails
