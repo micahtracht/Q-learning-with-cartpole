@@ -5,7 +5,7 @@ import gym
 from discretizer import Discretizer
 import matplotlib.pyplot as plt
 from typing import Sequence
-from config import cfg
+from config import cfg, Config
 
 # - Globals & Helpers -
 

@@ -8,7 +8,7 @@ import torch.optim as optim
 import gym
 from dqn_agent import DQN
 from replay_buffer import ReplayBuffer
-from config import cfg
+from config import cfg, Config
 
 # - Globals & Helpers -
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
