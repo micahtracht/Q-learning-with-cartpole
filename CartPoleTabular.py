@@ -5,11 +5,9 @@ import gym
 from discretizer import Discretizer
 import matplotlib.pyplot as plt
 from typing import Sequence
-from config import Config
+from config import cfg
 
 # - Globals & Helpers -
-
-cfg = Config()
 
 def moving_average(data: Sequence[float], window_size: int = 100) -> np.ndarray:
     """
@@ -47,9 +45,9 @@ def main(cfg: Config):
     env.action_space.seed(cfg.env.seed)
     env.action_space.n = 2  # discrete two-action CartPole
     
-    bins = [cfg.n_bins, cfg.n_bins, cfg.n_angle_bins, cfg.n_bins]
+    bins = [cfg.tabular.n_bins, cfg.tabular.n_bins, cfg.tabular.n_angle_bins, cfg.tabular.n_bins]
     Q = np.zeros(bins + [env.action_space.n], dtype=float)
-    disc = Discretizer(bins_per_feature=bins, lower_bounds=cfg.lower_bounds, upper_bounds=cfg.upper_bounds)
+    disc = Discretizer(bins_per_feature=bins, lower_bounds=cfg.tabular.lower_bounds, upper_bounds=cfg.tabular.upper_bounds)
     
     epsilon = cfg.tabular.epsilon
     alpha = cfg.tabular.alpha

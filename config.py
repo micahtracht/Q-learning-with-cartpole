@@ -2,7 +2,6 @@ from dataclasses import dataclass
 import numpy as np
 import yaml
 from pathlib import Path
-from typing import List
 @dataclass
 class EnvConfig:
     env_id: str
@@ -53,7 +52,7 @@ class Config:
 def load_config(path: Path = None) -> Config:
     if path is None:
         path = Path(__file__).parent / 'config.yaml'
-    raw = yaml.safe_load(path.read_txt())
+    raw = yaml.safe_load(path.read_text())
     
     env_cfg = EnvConfig(**raw['env'])
     dqn_cfg = DQNConfig(**raw['dqn'])

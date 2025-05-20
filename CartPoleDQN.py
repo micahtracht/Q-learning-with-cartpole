@@ -8,13 +8,10 @@ import torch.optim as optim
 import gym
 from dqn_agent import DQN
 from replay_buffer import ReplayBuffer
-from config import Config
+from config import cfg
 
 # - Globals & Helpers -
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# define config
-cfg = Config()
 
 random.seed(cfg.env.seed)
 np.random.seed(cfg.env.seed)
@@ -65,7 +62,7 @@ def main(cfg: Config):
     target_net.load_state_dict(policy_net.state_dict())
     
     optimizer = optim.Adam(policy_net.parameters(), lr=alpha)
-    replay_buffer = ReplayBuffer(capacity=cfg.buffer_size)
+    replay_buffer = ReplayBuffer(capacity=cfg.dqn.buffer_size)
     
     solved = False # only save once
     episode_rewards = []
@@ -91,7 +88,7 @@ def main(cfg: Config):
             total_reward += reward
             
             if len(replay_buffer) >= cfg.batch_size:
-                states, actions, rewards, next_states, dones = replay_buffer.sample(cfg.batch_size)
+                states, actions, rewards, next_states, dones = replay_buffer.sample(cfg.dqn.batch_size)
             
                 # convert to tensors
                 states_np = np.stack(states, axis=0).astype(np.float32)
@@ -112,7 +109,7 @@ def main(cfg: Config):
                     targets = rewards + cfg.dqn.gamma * (1 - dones) * next_q_values
                 
                 # loss & backprop
-                if len(replay_buffer) > cfg.warmup:
+                if len(replay_buffer) > cfg.dqn.warmup:
                     loss = nn.MSELoss()(q_values, targets)
                     optimizer.zero_grad()
                     loss.backward()
@@ -126,7 +123,7 @@ def main(cfg: Config):
         alpha = decay(alpha, cfg.dqn.alpha_decay, cfg.dqn.alpha_min)
         
         # sync target net
-        if episode % cfg.target_update_freq == 0:
+        if episode % cfg.dqn.target_update_freq == 0:
             target_net.load_state_dict(policy_net.state_dict())
         
         episode_rewards.append(total_reward)
@@ -138,7 +135,7 @@ def main(cfg: Config):
             print(f"Ep {episode}  R= {total_reward:.0f}, eps = {epsilon:.3f}  alpha = {alpha:.5f} recent avg = {recent_avg:.1f}")
             if not solved and recent_avg >= cfg.dqn.max_steps:
                 solved = True
-                torch.save(policy_net.state_dict(), cfg.save_path)
+                torch.save(policy_net.state_dict(), cfg.dqn.save_path)
                 print(f'Solved! Model saved to {cfg.save_path}')
         
     plot_rewards(episode_rewards, cfg.dqn.window)
