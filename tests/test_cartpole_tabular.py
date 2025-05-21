@@ -67,7 +67,6 @@ def test_main_smoke_runs_zero_episodes(monkeypatch):
     Smoke‐test main(cfg) with 0 episodes: it should return immediately
     (and not raise) when cfg.episodes_tabular = 0.
     """
-    cfg = Config()
     cfg.tabular.episodes = 0
     # Also override plt.show so we don't block
     import matplotlib.pyplot as plt

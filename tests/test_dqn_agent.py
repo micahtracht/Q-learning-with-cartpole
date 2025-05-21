@@ -20,14 +20,16 @@ def test_forward_batch_shape():
     assert out.shape == (batch_size, ACTION_DIM)
 
 
-def test_forward_single_sample_raises():
+def test_forward_single_sample_outputs_correct_shape():
     """
-    Passing a 1D tensor should raise a RuntimeError bc it misses the batch dim.
+    Passing a 1D tensor should be treated as a single sample,
+    producing a 1D output of length ACTION_DIM.
     """
     model = DQN(STATE_DIM, ACTION_DIM)
     x = torch.randn(STATE_DIM)
-    out = model(x.unsqueeze[0])
-    assert out.shape == (1, ACTION_DIM)
+    out = model(x)
+    assert isinstance(out, torch.Tensor)
+    assert out.shape == (ACTION_DIM,)
 
 
 def test_gradients_flow():

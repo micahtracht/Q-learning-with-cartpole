@@ -38,7 +38,7 @@ def test_moving_average_window_larger_than_data():
     data = [1, 2]
     ma = moving_average(data, window_size=5)
     assert isinstance(ma, np.ndarray)
-    assert ma.size == 4
+    assert ma.size == 2 # should be the same size as the given data
 
 
 @pytest.mark.parametrize("n,expected", [
