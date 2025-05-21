@@ -56,7 +56,7 @@ def main(cfg: Config):
     print('Starting tabular Q-learning')
     for episode in range(cfg.tabular.episodes):
         obs, _ = env.reset()
-        obs = clip_obs(obs, cfg.lower_bounds, cfg.upper_bounds)
+        obs = clip_obs(obs, cfg.tabular.lower_bounds, cfg.tabular.upper_bounds)
         state = disc.discretize(obs)
         total_reward = 0.0
         
@@ -68,7 +68,7 @@ def main(cfg: Config):
                 
                 next_obs, reward, terminated, truncated, _ = env.step(action)
                 done = terminated or truncated
-                next_obs = clip_obs(next_obs, cfg.lower_bounds, cfg.upper_bounds)
+                next_obs = clip_obs(next_obs, cfg.tabular.lower_bounds, cfg.tabular.upper_bounds)
                 next_state = disc.discretize(next_obs)
                 
                 # Bellman update
@@ -87,12 +87,12 @@ def main(cfg: Config):
         epsilon = decay(epsilon, cfg.tabular.epsilon_decay, cfg.tabular.epsilon_min)
         
         episode_rewards.append(total_reward)
-    if episode % 1000 == 0:
-        print(f"Episode {episode:5d}  Reward={total_reward:.1f}, epsilon={epsilon:.3f}  alpha={alpha:.3f}")
-        
-    avg_reward = sum(episode_rewards)/(len(episode_rewards))
-    print(f"Average reward over {cfg.tabular.episodes} episodes: {avg_reward:.2f}")
-    plot_rewards(episode_rewards, cfg.tabular.window)
+        if episode % 1000 == 0:
+            print(f"Episode {episode:5d}  Reward={total_reward:.1f}, epsilon={epsilon:.3f}  alpha={alpha:.3f}")
+    if len(episode_rewards) != 0:
+        avg_reward = sum(episode_rewards)/(len(episode_rewards))
+        print(f"Average reward over {cfg.tabular.episodes} episodes: {avg_reward:.2f}")
+        plot_rewards(episode_rewards, cfg.tabular.window)
 
 
 def plot_rewards(episode_rewards, window_tabular):
