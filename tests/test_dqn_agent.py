@@ -2,8 +2,6 @@ import torch
 import pytest
 from dqn_agent import DQN
 
-
-# code reviewer told me I should use variables like this for self documenting code... good idea.
 STATE_DIM = 4
 ACTION_DIM = 2
 

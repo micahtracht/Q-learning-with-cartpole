@@ -21,7 +21,6 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed(cfg.env.seed)
 
 # - Main training loop -
-print('entered main')
 def main(cfg: Config):
     epsilon = cfg.dqn.epsilon
     alpha = cfg.dqn.alpha
@@ -119,7 +118,7 @@ def main(cfg: Config):
             if not solved and recent_avg >= cfg.dqn.max_steps:
                 solved = True
                 torch.save(policy_net.state_dict(), cfg.dqn.save_path)
-                print(f'Solved! Model saved to {cfg.save_path}')
+                print(f'Solved! Model saved to {cfg.dqn.save_path}')
         
     plot_rewards(episode_rewards, cfg.dqn.window)
 
