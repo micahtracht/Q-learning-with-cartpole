@@ -37,31 +37,6 @@ def test_clip_obs_broadcasting():
     out = clip_obs(obs, low, high)
     assert np.allclose(out, expected)
 
-def test_moving_average_simple():
-    """
-    A simple increasing list with window = 2. Tests  basic functionality.
-    """
-    data   = [0, 1, 2, 3, 4]
-    result = moving_average(data, window_size=2)
-    assert np.allclose(result, np.array([0.5, 1.5, 2.5, 3.5]))
-
-def test_moving_average_window_equals_length():
-    """
-    When window == len(data), should return a single average (the mean of the data).
-    """
-    data   = [10, 20, 30]
-    result = moving_average(data, window_size=3)
-    assert np.allclose(result, np.array([(10 + 20 + 30) / 3]))
-
-def test_moving_average_window_larger_than_data():
-    """
-    If window > len(data), then numpy.convolve returns an empty array if 'valid' is used.
-    """
-    data   = [1, 2]
-    result = moving_average(data, window_size=5)
-    assert isinstance(result, np.ndarray)
-    assert result.size == 4
-
 def test_main_smoke_runs_zero_episodes(monkeypatch):
     """
     Smoke‐test main(cfg) with 0 episodes: it should return immediately

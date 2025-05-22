@@ -9,6 +9,7 @@ import gym
 from dqn_agent import DQN
 from replay_buffer import ReplayBuffer
 from config import cfg, Config
+from utils import moving_average, decay
 
 # - Globals & Helpers -
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -19,32 +20,8 @@ torch.manual_seed(cfg.env.seed)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(cfg.env.seed)
 
-
-def moving_average(data: Sequence[float], window_size: int=100) -> np.ndarray:
-    """
-    Compute the moving average of a 1D sequence.
-
-    Args:
-        data: A sequence of numeric values.
-        window_size: The number of elements over which to average/convolve.
-
-    Returns:
-        A numpy array of size len(data) - window_size + 1 containing the moving average values.
-    """
-    if not isinstance(window_size, int) or window_size < 1:
-        raise ValueError("window_size must be greater than 0 and an integer.")
-    n = len(data)
-    if window_size > n:
-        mean = float(np.sum(data) / n)
-        return np.full(n, mean, dtype=float)
-    ret = np.cumsum(data, dtype=float)
-    ret[window_size:] = ret[window_size:] - ret[:-window_size]
-    return ret[window_size - 1:] / window_size
-
-def decay(value: float, decay_rate: float, min_val: float) -> float:
-    return max(min_val, value * decay_rate)
-
 # - Main training loop -
+print('entered main')
 def main(cfg: Config):
     epsilon = cfg.dqn.epsilon
     alpha = cfg.dqn.alpha
@@ -93,7 +70,7 @@ def main(cfg: Config):
             state = next_state
             total_reward += reward
             
-            if len(replay_buffer) >= cfg.batch_size:
+            if len(replay_buffer) >= cfg.dqn.batch_size:
                 states, actions, rewards, next_states, dones = replay_buffer.sample(cfg.dqn.batch_size)
             
                 # convert to tensors

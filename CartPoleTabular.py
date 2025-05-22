@@ -6,22 +6,9 @@ from discretizer import Discretizer
 import matplotlib.pyplot as plt
 from typing import Sequence
 from config import cfg, Config
+from utils import moving_average, decay
 
 # - Globals & Helpers -
-
-def moving_average(data: Sequence[float], window_size: int = 100) -> np.ndarray:
-    """
-    Compute the moving average of a 1D sequence.
-
-    Args:
-        data: A sequence of numeric values.
-        window_size: The number of elements over which to average/convolve.
-
-    Returns:
-        A numpy array of size len(data) - window_size + 1 containing the moving average values.
-    """
-    return np.convolve(data, np.ones(window_size)/window_size, mode='valid')
-
 def clip_obs(obs: np.ndarray, low: np.ndarray, high: np.ndarray) -> np.ndarray:
     '''
     Clips each feature of obs into range [low_i, high_i]. Important to avoid wrap arounds.
@@ -35,9 +22,6 @@ def clip_obs(obs: np.ndarray, low: np.ndarray, high: np.ndarray) -> np.ndarray:
         np.ndarray: The clipped array of observations
     '''
     return np.clip(obs, low, high)
-
-def decay(val: float, decay_rate: float, min_val: float) -> float:
-    return max(val * decay_rate, min_val)
 
 def main(cfg: Config):
     env = gym.make(cfg.env.env_id)
@@ -88,7 +72,7 @@ def main(cfg: Config):
         
         episode_rewards.append(total_reward)
         if episode % 1000 == 0:
-            print(f"Episode {episode:5d}  Reward={total_reward:.1f}, epsilon={epsilon:.3f}  alpha={alpha:.3f}")
+            print(f"Episode {episode},Reward={total_reward:.1f}, epsilon={epsilon:.3f}  alpha={alpha:.3f}")
     if len(episode_rewards) != 0:
         avg_reward = sum(episode_rewards)/(len(episode_rewards))
         print(f"Average reward over {cfg.tabular.episodes} episodes: {avg_reward:.2f}")
