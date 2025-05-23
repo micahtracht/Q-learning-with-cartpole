@@ -1,8 +1,0 @@
-# Minimal dependencies needed to import & test CartPoleTabular.py and CartPoleDQN.py
-
-numpy
-pytest
-gym
-matplotlib
-torch        # CPU-only, from PyPI
-pyyaml       # for your YAML config loader
