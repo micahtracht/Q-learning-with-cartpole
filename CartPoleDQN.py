@@ -1,5 +1,5 @@
 import random
-from typing import Sequence
+from typing import List
 from matplotlib import pyplot as plt
 import numpy as np
 import torch
@@ -14,20 +14,22 @@ from utils import moving_average, decay
 # - Globals & Helpers -
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-random.seed(cfg.env.seed)
-np.random.seed(cfg.env.seed)
-torch.manual_seed(cfg.env.seed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(cfg.env.seed)
-
 # - Main training loop -
-def main(cfg: Config):
+def run_one_experiment(cfg: Config, seed: int = cfg.env.seed):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    
+    
     epsilon = cfg.dqn.epsilon
     alpha = cfg.dqn.alpha
     # Set up environment
     env = gym.make(cfg.env.env_id)
-    env.observation_space.seed(cfg.env.seed)
-    env.action_space.seed(cfg.env.seed)
+    env.observation_space.seed(seed)
+    env.action_space.seed(seed)
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
     
@@ -69,7 +71,7 @@ def main(cfg: Config):
             state = next_state
             total_reward += reward
             
-            if len(replay_buffer) >= cfg.dqn.batch_size:
+            if len(replay_buffer) >= cfg.dqn.batch_size and len(replay_buffer) >= cfg.dqn.warmup:
                 states, actions, rewards, next_states, dones = replay_buffer.sample(cfg.dqn.batch_size)
             
                 # convert to tensors
@@ -119,11 +121,38 @@ def main(cfg: Config):
                 solved = True
                 torch.save(policy_net.state_dict(), cfg.dqn.save_path)
                 print(f'Solved! Model saved to {cfg.dqn.save_path}')
-        
-    plot_rewards(episode_rewards, cfg.dqn.window)
+    return episode_rewards
+
+def plot_average_rewards(all_rewards_lists: List[List[float]], num_runs: int, window_dqn: int = 100) -> None:
+    if not all_rewards_lists:
+        print('Nothing to plot.')
+        return 
+    
+    min_len = min(len(r) for r in all_rewards_lists)
+    processed = np.array([r[:min_len] for r in all_rewards_lists])
+    smoothed = np.array([moving_average(run, window_dqn)] for run in processed)
+
+    min_smoothed = min(len(s) for s in smoothed)
+    final_smoothed = np.array([sr[:min_smoothed] for sr in smoothed])
+    
+    mean_smoothed = np.mean(final_smoothed, axis=0)
+    std_smoothed = np.std(final_smoothed, axis=0)
+    
+    episodes_x = np.arange(min_smoothed)
+    
+    plt.plot(episodes_x, mean_smoothed, label=f"Mean Reward ({window_dqn}-ep MA)")
+    plt.fill_between(episodes_x, mean_smoothed - std_smoothed, mean_smoothed + std_smoothed, alpha=0.3, label="Std Dev")
+    
+    plt.xlabel(f"Episode (Window: {window_dqn})") # Updated label
+    plt.ylabel("Average Reward")
+    plt.title(f"DQN Smoothed Reward Curve (Avg over {num_runs} runs)") # MODIFIED: Updated title
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show() # MODIFIED: Show plot here
 
 
-def plot_rewards(episode_rewards, window_dqn):
+def plot_rewards(episode_rewards: int, window_dqn: int) -> None:
     smoothed = moving_average(episode_rewards, window_dqn)
     
     plt.subplot(1,2,2)
@@ -138,4 +167,16 @@ def plot_rewards(episode_rewards, window_dqn):
     plt.show()
 
 if __name__ == '__main__':
-    main(cfg)
+    num_runs = 5
+    seeds = [int(10000 * np.random.rand()) for i in range(num_runs)]
+    
+    all_episodes_rewards = []
+    
+    for i in range(num_runs):
+        curr_run_seed = seeds[i]
+        print(f"\n--- Starting Run {i+1}/{num_runs} with Seed: {curr_run_seed} ---")
+        rewards_single_run = run_one_experiment(cfg, curr_run_seed)
+        all_episodes_rewards.append(rewards_single_run)
+    
+    print('all completed')
+    plot_average_rewards(all_episodes_rewards, cfg.dqn.window, num_runs)

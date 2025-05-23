@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from CartPoleDQN import moving_average, main
+from CartPoleDQN import run_one_experiment
 from config import cfg
 
 def test_smoke_main_runs_zero_episodes(monkeypatch):
@@ -14,4 +14,4 @@ def test_smoke_main_runs_zero_episodes(monkeypatch):
 
 
     cfg.dqn.episodes = 0
-    main(cfg) # if raises, test fails
+    run_one_experiment(cfg) # if raises, test fails

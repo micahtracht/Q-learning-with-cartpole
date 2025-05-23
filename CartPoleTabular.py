@@ -4,7 +4,6 @@ if not hasattr(np, 'bool8'): # fix annoying error with gym, this took me 30 minu
 import gym
 from discretizer import Discretizer
 import matplotlib.pyplot as plt
-from typing import Sequence
 from config import cfg, Config
 from utils import moving_average, decay
 
@@ -23,7 +22,7 @@ def clip_obs(obs: np.ndarray, low: np.ndarray, high: np.ndarray) -> np.ndarray:
     '''
     return np.clip(obs, low, high)
 
-def main(cfg: Config):
+def main(cfg: Config, seed: int = cfg.env.seed):
     env = gym.make(cfg.env.env_id)
     env.observation_space.seed(cfg.env.seed)
     env.action_space.seed(cfg.env.seed)
