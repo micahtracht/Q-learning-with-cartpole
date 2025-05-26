@@ -3,7 +3,7 @@ import pytest
 from CartPoleDQN import run_one_experiment
 from config import cfg
 
-def test_smoke_main_runs_zero_episodes(monkeypatch):
+def test_smoke_run_zero_episodes(monkeypatch):
     """
     Smoke-test main(cfg) with 0 episodes: should import and return
     without error when episodes_dqn=0.

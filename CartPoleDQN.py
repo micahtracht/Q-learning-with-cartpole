@@ -130,8 +130,15 @@ def plot_average_rewards(all_rewards_lists: List[List[float]], num_runs: int, wi
     
     min_len = min(len(r) for r in all_rewards_lists)
     processed = np.array([r[:min_len] for r in all_rewards_lists])
-    smoothed = np.array([moving_average(run, window_dqn)] for run in processed)
+    
 
+    ma_intermediate_results = []
+    for run_data in processed:
+        current_ma = moving_average(run_data, window_dqn)
+        ma_intermediate_results.append(current_ma)
+    
+    smoothed = np.array(ma_intermediate_results)
+    
     min_smoothed = min(len(s) for s in smoothed)
     final_smoothed = np.array([sr[:min_smoothed] for sr in smoothed])
     
@@ -143,13 +150,13 @@ def plot_average_rewards(all_rewards_lists: List[List[float]], num_runs: int, wi
     plt.plot(episodes_x, mean_smoothed, label=f"Mean Reward ({window_dqn}-ep MA)")
     plt.fill_between(episodes_x, mean_smoothed - std_smoothed, mean_smoothed + std_smoothed, alpha=0.3, label="Std Dev")
     
-    plt.xlabel(f"Episode (Window: {window_dqn})") # Updated label
+    plt.xlabel(f"Episode (Window: {window_dqn})")
     plt.ylabel("Average Reward")
-    plt.title(f"DQN Smoothed Reward Curve (Avg over {num_runs} runs)") # MODIFIED: Updated title
+    plt.title(f"DQN Smoothed Reward Curve (Avg over {num_runs} runs)")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.show() # MODIFIED: Show plot here
+    plt.show()
 
 
 def plot_rewards(episode_rewards: int, window_dqn: int) -> None:
@@ -179,4 +186,4 @@ if __name__ == '__main__':
         all_episodes_rewards.append(rewards_single_run)
     
     print('all completed')
-    plot_average_rewards(all_episodes_rewards, cfg.dqn.window, num_runs)
+    plot_average_rewards(all_episodes_rewards, num_runs, cfg.dqn.window)

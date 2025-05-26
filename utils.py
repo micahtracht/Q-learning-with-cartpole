@@ -16,6 +16,8 @@ def moving_average(data: Sequence[float], window_size: int=100) -> np.ndarray:
         raise ValueError("window_size must be greater than 0 and an integer.")
     n = len(data)
     if window_size > n:
+        if n == 0: # if empty
+            return np.array([], dtype=float)
         mean = float(np.sum(data) / n)
         return np.full(n, mean, dtype=float)
     ret = np.cumsum(data, dtype=float)
