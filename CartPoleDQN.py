@@ -48,6 +48,8 @@ def run_one_experiment(cfg: Config, seed: int = cfg.env.seed):
     optimizer = optim.Adam(policy_net.parameters(), lr=alpha)
     replay_buffer = ReplayBuffer(capacity=cfg.dqn.buffer_size)
     
+    episode_solved_at = -1 # when the agent solves it
+    
     solved = False # only save once
     episode_rewards = []
     print('Started training.')
@@ -121,7 +123,8 @@ def run_one_experiment(cfg: Config, seed: int = cfg.env.seed):
                 solved = True
                 torch.save(policy_net.state_dict(), cfg.dqn.save_path)
                 print(f'Solved! Model saved to {cfg.dqn.save_path}')
-    return episode_rewards
+                episode_solved_at = episode
+    return episode_rewards, episode_solved_at
 
 def plot_average_rewards(all_rewards_lists: List[List[float]], num_runs: int, window_dqn: int = 100) -> None:
     if not all_rewards_lists:
@@ -178,12 +181,35 @@ if __name__ == '__main__':
     seeds = [int(10000 * np.random.rand()) for i in range(num_runs)]
     
     all_episodes_rewards = []
+    when_solved = []
+    avg_run_rewards_list = []
     
     for i in range(num_runs):
         curr_run_seed = seeds[i]
-        print(f"\n--- Starting Run {i+1}/{num_runs} with Seed: {curr_run_seed} ---")
-        rewards_single_run = run_one_experiment(cfg, curr_run_seed)
+        print(f"\nStarting Run {i+1}/{num_runs} with Seed: {curr_run_seed}")
+        rewards_single_run, solve_time = run_one_experiment(cfg, curr_run_seed)
         all_episodes_rewards.append(rewards_single_run)
+        if solve_time != -1:
+            when_solved.append(solve_time)
+        
+        final_avg_reward = np.mean(rewards_single_run)
+        avg_run_rewards_list.append(final_avg_reward)
+    
+    if len(when_solved) > 0:
+        mean_solve_time = np.mean(when_solved)
+        std_solve_time = np.std(when_solved)
+        print(f"Episodes to solve (for solved runs): Mean={mean_solve_time:.2f}, StdDev={std_solve_time:.2f}")
+        print(f"Solved episodes list: {when_solved}")
+    else:
+        print('No runs solved.')
+    
+    if avg_run_rewards_list:
+        mean_final_reward = np.mean(avg_run_rewards_list)
+        std_final_reward = np.std(avg_run_rewards_list)
+        print(f"Average rewards across runs: Mean={mean_final_reward:.2f}, StdDev={std_final_reward:.2f}") #
+        print(f"Individual run average rewards: {[float(f'{r:.2f}') for r in avg_run_rewards_list]}")
     
     print('all completed')
     plot_average_rewards(all_episodes_rewards, num_runs, cfg.dqn.window)
+    
+    

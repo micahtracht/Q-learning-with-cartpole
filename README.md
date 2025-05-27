@@ -78,6 +78,29 @@ Reward curve image for Tabularized Q-learning agent:
 Reward curve image for Deep Q-learning agent:
 ![Smoothed 100-episode reward curve, showing convergence at ~500 at times, but unstable training](assets/DQNRewardCurve.png)
 
+## Ablation Study
+
+ #### Purpose
+To understand the impact of changes to the epsilon (random exploration) parameter on model learning and performance.
+
+Ablated parameters
+Epsilon min, starting epsilon.
+
+ #### Methodology
+5 runs were conducted for each of three model configurations:
+-No ablations (control group)
+-No epsilon min
+-Epsilon = 0
+
+Reward graphs were composed that show the average results over 5 runs for the models, with the shaded area representing performance within one standard deviation of the mean.
+Mean and standard deviation reward data were also recorded, as was time to solve the simulation (defined as reaching a 500.0 100 episode moving average, or having 100 perfect episodes in a row), if the model solved it.
+
+ #### Results
+Configuration         | Solved Runs / Total Runs | Episodes to Solve (Mean ± StdDev) | Solved Episodes List      | Avg. Reward Across All Runs (Mean ± StdDev) | Individual Run Avg.
+Control               | 5/5 = 100%               | 1575 ± 422.40                     | 1400, 1050, 1640, 2210    | 311.5 ± 33.53                               | 329.19, 332.75, 344.62, 298.62, 251.56	
+No Epsilon Min        | 5/5 = 100%               | 1832.50 ± 151.39                  | 1770, 1700, 1770, 2090    | 316.02 ± 29.78                              | 294.34, 304.64, 358.14, 279.74, 343.27
+Epsilon = 0           | 2/5 = 40%                 | 1405 ± 75 (for the 2 solved runs)| 1480, 1330                | 134.89 ± 157.46                             | 269.41, 9.37, 9.35, 376.97, 9.36
+
 ## Files
 
  - CartPoleTabularized.py: Main training loop for tabularized Q-learning.
