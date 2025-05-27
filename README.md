@@ -113,14 +113,24 @@ Control               | 5/5 = 100%               | 1575 ± 422.40               
 No Epsilon Min        | 5/5 = 100%               | 1832.50 ± 151.39                  | 1770, 1700, 1770, 2090    | 316.02 ± 29.78                              | 294.34, 304.64, 358.14, 279.74, 343.27
 Epsilon = 0 (greedy)  | 2/5 = 40%                | 1405 ± 75 (for the 2 solved runs) | 1480, 1330                | 134.89 ± 157.46                             | 269.41, 9.37, 9.35, 376.97, 9.36
 
-Caption: Average reward curve for the Baseline DQN configuration over 5 runs. The shaded area represents ±1 standard deviation.
+Average reward curve for the Baseline DQN configuration over 5 runs. The shaded area represents ±1 standard deviation.
+
 ![Baseline DQN Rewards](assets/5RunDiffSeedExperiment.png)
 
-Caption: Average reward curve for the "No Epsilon Min" configuration over 5 runs. The shaded area represents ±1 standard deviation.
+Average reward curve for the "No Epsilon Min" configuration over 5 runs. The shaded area represents ±1 standard deviation.
+
 ![No Epsilon Min Rewards](assets/NoEpsMin5RunRLGraph.png)
 
 Average reward curve for the "Epsilon = 0 (Greedy)" configuration over 5 runs. The shaded area represents ±1 standard deviation.
+
 ![Epsilon = 0 Rewards](assets/NoEpsilonRewardPlotCartPole.png)
+
+#### Discussion of findings
+
+* **Baseline DQN (Control):** The baseline configuration demonstrated predictable, fast learning that produced a high reward. All five runs successfully solved the simulation, and it did so very quickly.
+* **No epsilon min (epsilon_min = 0):** Removing the floor did not affect the earlier stages of the run. In the later stages, removing the epsilon floor resulted in stable and strong performance. In total, however, the performance was not notably different from baseline DQN, with time to solve and average rewards all falling within margin of error for 5 runs.
+* **No epsilon (epsilon = 0):** Removing any exploration resulted in highly variable and unstable training. The model would in some runs never learn to perform well, while in other runs it would learn quite quickly. Ultimately, eliminating any exploration had a detrimental impact on model performance, as it resulted in a 40% solve rate (as compared to 100% for the other two configurations) and a markedly lower average reward across all 5 runs. This is clearly visible in each run's average rewards, in which 3 of the 5 runs averaged less than 10 reward per run, likely due to the model getting stuck in suboptimal local minima early on. With the lack of exploration, they were never able to take random steps to escape these local minima.
+* **Conclusion:** This study demonstrates the importance of epsilon-greedy exploration to improve training run reliability and success. Without it, the agent often gets stuck in local minima it is unable to escape from. Further studies are still required to determine the impact of the removal of an epsilon minimum from the model, especially as the epsilon decay parameter varies.
 
 
 ## Files
