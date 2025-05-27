@@ -86,20 +86,42 @@ To understand the impact of changes to the epsilon (random exploration) paramete
 Ablated parameters
 Epsilon min, starting epsilon.
 
- #### Methodology
+ #### Ablation Configurations
 5 runs were conducted for each of three model configurations:
 -No ablations (control group)
--No epsilon min
--Epsilon = 0
+-No epsilon min: This configuration removes the floor for epsilon, so the agent gets increasingly greedy as time goes on, until it almost never explores.
+-Epsilon = 0: This configuration removes exploration altogether, so the agent never explores and only takes greedy actions, even at the start.  
 
 Reward graphs were composed that show the average results over 5 runs for the models, with the shaded area representing performance within one standard deviation of the mean.
 Mean and standard deviation reward data were also recorded, as was time to solve the simulation (defined as reaching a 500.0 100 episode moving average, or having 100 perfect episodes in a row), if the model solved it.
+
+#### Methodology
+
+For each of the three configurations, 5 independent training runs were conducted, each with a different random seed. The agent's performance was tracked by recording the total reward achieved in each episode.
+
+Key metrics collected include:
+* **Solved Runs**: The number of runs out of 5 that successfully "solved" the environment.
+* **Definition of Solved**: An experiment run was considered "solved" if the agent achieved a 100-episode moving average reward of 500.0.
+* **Episodes to Solve**: For runs that solved the environment, the number of episodes required to first reach the "solved" criterion.
+* **Average Reward Across All Runs**: The mean and standard deviation of the total rewards per episode, averaged first within each run, and then across all 5 runs for that configuration.
+* **Individual Run Average Rewards**: The average reward per episode for each of the 5 individual runs.
+
 
  #### Results
 Configuration         | Solved Runs / Total Runs | Episodes to Solve (Mean ± StdDev) | Solved Episodes List      | Avg. Reward Across All Runs (Mean ± StdDev) | Individual Run Avg.
 Control               | 5/5 = 100%               | 1575 ± 422.40                     | 1400, 1050, 1640, 2210    | 311.5 ± 33.53                               | 329.19, 332.75, 344.62, 298.62, 251.56	
 No Epsilon Min        | 5/5 = 100%               | 1832.50 ± 151.39                  | 1770, 1700, 1770, 2090    | 316.02 ± 29.78                              | 294.34, 304.64, 358.14, 279.74, 343.27
-Epsilon = 0           | 2/5 = 40%                 | 1405 ± 75 (for the 2 solved runs)| 1480, 1330                | 134.89 ± 157.46                             | 269.41, 9.37, 9.35, 376.97, 9.36
+Epsilon = 0 (greedy)  | 2/5 = 40%                | 1405 ± 75 (for the 2 solved runs) | 1480, 1330                | 134.89 ± 157.46                             | 269.41, 9.37, 9.35, 376.97, 9.36
+
+Caption: Average reward curve for the Baseline DQN configuration over 5 runs. The shaded area represents ±1 standard deviation.
+![Baseline DQN Rewards](assets\5RunDiffSeedExperiment.png)
+
+Caption: Average reward curve for the "No Epsilon Min" configuration over 5 runs. The shaded area represents ±1 standard deviation.
+![No Epsilon Min Rewards](assets\NoEpsMin5RunRLGraph.png)
+
+Average reward curve for the "Epsilon = 0 (Greedy)" configuration over 5 runs. The shaded area represents ±1 standard deviation.
+![Epsilon = 0 Rewards](assets\NoEpsilonRewardPlotCartPole.png)
+
 
 ## Files
 
