@@ -114,13 +114,13 @@ No Epsilon Min        | 5/5 = 100%               | 1832.50 ± 151.39            
 Epsilon = 0 (greedy)  | 2/5 = 40%                | 1405 ± 75 (for the 2 solved runs) | 1480, 1330                | 134.89 ± 157.46                             | 269.41, 9.37, 9.35, 376.97, 9.36
 
 Caption: Average reward curve for the Baseline DQN configuration over 5 runs. The shaded area represents ±1 standard deviation.
-![Baseline DQN Rewards](assets\5RunDiffSeedExperiment.png)
+![Baseline DQN Rewards](assets/5RunDiffSeedExperiment.png)
 
 Caption: Average reward curve for the "No Epsilon Min" configuration over 5 runs. The shaded area represents ±1 standard deviation.
-![No Epsilon Min Rewards](assets\NoEpsMin5RunRLGraph.png)
+![No Epsilon Min Rewards](assets/NoEpsMin5RunRLGraph.png)
 
 Average reward curve for the "Epsilon = 0 (Greedy)" configuration over 5 runs. The shaded area represents ±1 standard deviation.
-![Epsilon = 0 Rewards](assets\NoEpsilonRewardPlotCartPole.png)
+![Epsilon = 0 Rewards](assets/NoEpsilonRewardPlotCartPole.png)
 
 
 ## Files
